@@ -9,6 +9,7 @@ import (
 	"github.com/saad7890/flowship/internal/config"
 	"github.com/saad7890/flowship/internal/handler"
 	"github.com/saad7890/flowship/internal/infrastructure/postgres"
+	"github.com/saad7890/flowship/internal/usecase"
 )
 
 func main(){
@@ -23,7 +24,10 @@ func main(){
 
 	defer db.Close()
 
-	router := handler.NewRouter()
+	parcelRepo := postgres.NewParcelRepository(db)
+	parcelUsecase := usecase.NewParcelUsecase(parcelRepo)
+
+	router := handler.NewRouter(parcelUsecase)
 	fmt.Println("Starting", cfg.AppName)
 	fmt.Println("Listening on port:", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))
